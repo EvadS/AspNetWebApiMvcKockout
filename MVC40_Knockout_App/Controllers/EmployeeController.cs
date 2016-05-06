@@ -16,5 +16,9 @@ namespace MVC40_Knockout_App.Controllers
             return View();
         }
 
+        public ActionResult Create()
+        {
+            return View("Create");
+        }
     }
 }
