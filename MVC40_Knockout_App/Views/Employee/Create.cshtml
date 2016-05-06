@@ -1,13 +1,16 @@
 ﻿@{
     ViewBag.Title = "Create";
 }
-<script src="~/Scripts/jquery-1.8.2.js"></script>
-<script src="~/Scripts/knockout-2.2.0.js"></script>
-<script src="~/Scripts/knockout.mapping-latest.js"></script>
+
+
+@*<script src="~/Scripts/knockout.mapping-latest.js"></script>*@
+
+
+<script src="~/Scripts/jquery-1.6.4.js"></script>
+<script src="~/Scripts/knockout-3.4.0.js"></script>
 <link href="~/Content/Site.css" rel="stylesheet" />
 
 <h2>Create</h2>
-
 
 <form>
     <table>
@@ -18,41 +21,42 @@
                     <tr>
                         <td>EmpNo</td>
                         <td>
-                            <input type="text" id="txteno" disabled="disabled" /></td>
+                            <input type="text" id="txteno" data-bind="value: $root.EmpNo" disabled="disabled" /></td>
                     </tr>
                     <tr>
                         <td>EmpName</td>
                         <td>
-                            <input type="text" id="txtename" /></td>
+                            <input type="text" id="txtename" data-bind="value: $root.EmpName" /></td>
                     </tr>
                     <tr>
                         <td>Salary</td>
                         <td>
-                            <input type="text" id="txtsal" /></td>
+                            <input type="text" id="txtsal" data-bind="value: $root.Salary" /></td>
                     </tr>
                     <tr>
                         <td>DeptName</td>
                         <td>
-                            <input type="text" id="txtdname" /></td>
+                            <input type="text" id="txtdname" data-bind="value: $root.DeptName" /></td>
                     </tr>
                     <tr>
                         <td>Designation</td>
                         <td>
-                            <input type="text" id="txtdesig" /></td>
+                            <input type="text" id="txtdesig" data-bind="value: $root.Designation" />
+                        </td>
                     </tr>
                     <tr>
                         <!--The click binding has the JavaScirpt methods passed to it-->
                         <td>
-                            <button>Save</button></td>
+                            <button data-bind="click: $root.save">Save</button></td>
                         <td>
-                            <button>Update</button></td>
+                            <button data-bind="click: $root.update">Update</button></td>
                     </tr>
                 </table>
             </td>
             <td>
                 <div class="FixedContainer">
-                    <!--If the length of the Employees is greater than 0 then visible the Table-->
-                    <table style="border: double">
+                    <!--If the lenght of the Employees is greater than 0 then visible the Table-->
+                    <table data-bind="visible: Employees().length > 0" style="border: double">
                         <thead>
                             <tr>
                                 <td>EmpNo</td>
@@ -64,15 +68,16 @@
                             </tr>
                         </thead>
                         <!--Iterate through an observableArray using foreach-->
-                        <tbody>
-                            <tr style="border: solid">
-                                <td><span></span></td>
-                                <td><span></span></td>
-                                <td><span></span></td>
-                                <td><span></span></td>
-                                <td><span></span></td>
+                        <tbody data-bind="foreach: Employees">
+                            <tr style="border: solid" data-bind="click: $root.getselectedemployee" id="updtr">
+                                <td><span data-bind="text: EmpNo"></span></td>
+                                <td><span data-bind="text: EmpName"></span></td>
+                                <td><span data-bind="text: Salary"></span></td>
+                                <td><span data-bind="text: DeptName"></span></td>
+                                <td><span data-bind="text: Designation"></span></td>
                                 <td>
-                                    <button>Delete</button></td>
+                                    <button data-bind="click: $root.deleterec">Delete</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -82,7 +87,11 @@
     </table>
 </form>
 
+
 <script type="text/javascript">
+    $(document).ready(function () {
+        alert("ready!");
+    });
 
     var EmpViewModel = function () {
         //Make the self as 'this' reference
@@ -110,10 +119,12 @@
 
         //Function to perform POST (insert Employee) operation
         self.save = function () {
+
+          
             //Ajax call to Insert the Employee
             $.ajax({
                 type: "POST",
-                url: "http://localhost:50457/api/EmployeeInfoAPI",
+                url: "/api/EmployeeInfoAPI",
                 data: ko.toJSON(EmpData), //Convert the Observable Data into JSON
                 contentType: "application/json",
 
@@ -132,7 +143,7 @@
         };
 
         self.update = function () {
-            var url = "http://localhost:50457/api/EmployeeInfoAPI/" + self.EmpNo();
+            var url = "/api/EmployeeInfoAPI/" + self.EmpNo();
             alert(url);
             $.ajax({
                 type: "PUT",
@@ -153,7 +164,7 @@
         self.deleterec = function (employee) {
             $.ajax({
                 type: "DELETE",
-                url: "http://localhost:50457/api/EmployeeInfoAPI/" + employee.EmpNo,
+                url: "/api/EmployeeInfoAPI/" + employee.EmpNo,
                 success: function (data) {
                     alert("Record Deleted Successfully");
                     GetEmployees();//Refresh the Table
@@ -170,7 +181,7 @@
             //Ajax Call Get All Employee Records
             $.ajax({
                 type: "GET",
-                url: "http://localhost:50457/api/EmployeeInfoAPI",
+                url: "/api/EmployeeInfoAPI",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
